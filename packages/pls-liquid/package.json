@@ -4,11 +4,11 @@
 	"private": true,
 	"type": "module",
 	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
+	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
-		"dev": "echo 'Add dev script here'",
-		"build": "echo 'Add build script here'",
+		"dev": "npm run build -- --watch",
+		"build": "tsup index.ts --format esm --dts",
 		"test": "echo 'Add test script here'",
 		"lint": "echo 'Add lint script here'"
 	},
@@ -23,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@repo/eslint-config": "workspace:*",
-		"@repo/typescript-config": "workspace:*"
+		"@repo/typescript-config": "workspace:*",
+		"tsup": "^8.0.1"
 	}
 }

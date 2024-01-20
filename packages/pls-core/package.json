@@ -2,12 +2,19 @@
 	"name": "pls-core",
 	"version": "0.0.0",
 	"private": true,
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
 	"scripts": {
-		"build": "echo 'Add build script here'",
+		"dev": "npm run build -- --watch",
+		"build": "tsup index.ts --format cjs,esm --dts",
 		"test": "echo 'Add test script here'",
 		"lint": "echo 'Add lint script here'"
 	},
 	"dependencies": {
 		"zod": "^3.22.4"
+	},
+	"devDependencies": {
+		"tsup": "^8.0.1"
 	}
 }

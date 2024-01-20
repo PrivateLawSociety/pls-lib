@@ -22,13 +22,19 @@ const TaprootV0CollateralSchema = {
 	arbitratorsQuorum: z.number(),
 	multisigAddress: z.string(),
 	pubkeys: PubkeysSchema,
+	type: z.literal("taproot-v0"),
 };
 
-export const bitcoinCollateralSchema = z.object({
-	network: z.union([z.literal("bitcoin"), z.literal("bitcoin_testnet")]),
-	type: z.literal("taproot-v0"),
-	...TaprootV0CollateralSchema,
-});
+export const bitcoinSchemas = {
+	mainnet: z.object({
+		network: z.literal("bitcoin"),
+		...TaprootV0CollateralSchema,
+	}),
+	testnet: z.object({
+		network: z.literal("bitcoin_testnet"),
+		...TaprootV0CollateralSchema,
+	}),
+};
 
 // Invalid point, there is not priv key to sign this, should be random
 export const H = Buffer.from(
@@ -82,7 +88,7 @@ export function createBitcoinMultisig(
 			// when building Taptree, prioritize parts agreement script (shortest path), using 1 for parts script and 5 for scripts with arbitrators
 			weight: idx ? 1 : 5,
 			leaf: { output: script.fromASM(ma) },
-			combination: childNodesCombinations[idx],
+			combination: childNodesCombinations[idx]!,
 		};
 	});
 

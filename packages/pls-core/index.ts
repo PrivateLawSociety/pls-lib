@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { createHash } from "crypto";
 
 export const PubkeysSchema = z
 	.object({
@@ -24,11 +25,53 @@ export function createContractSchema<
 	collateralOptions: CollateralOptions,
 	communicationOptions: CommunicationOptions
 ) {
-	return z.object({
+	const unsigned = z.object({
 		collateral: z.discriminatedUnion("network", collateralOptions),
 		communication: z.discriminatedUnion("type", communicationOptions),
 		document: DocumentSchema,
-		signatures: z.record(z.string()),
 		version: z.literal(0),
 	});
+
+	const signed = unsigned.merge(
+		z.object({
+			signatures: z.record(z.string()),
+		})
+	);
+
+	return {
+		unsigned,
+		signed,
+	};
+}
+
+/**
+ * @description Sorts an object's properties
+ */
+function sortObjectProperties<T>(obj: Record<string, T>): Record<string, T> {
+	const sortedObj: Record<string, any> = {};
+
+	const sortedKeys = Object.keys(obj).sort();
+
+	for (const key of sortedKeys) {
+		const value = obj[key];
+
+		if (typeof value == "object") {
+			sortedObj[key] = sortObjectProperties(value as any);
+		} else {
+			sortedObj[key] = obj[key];
+		}
+	}
+
+	return sortedObj;
+}
+
+/**
+ * @description hashes an Object deterministically
+ */
+export function hashFromJSON(obj: Record<string, any>) {
+	const json = JSON.stringify(sortObjectProperties(obj));
+
+	return createHash("sha256")
+		.update(new Uint8Array(Buffer.from(json)))
+		.digest();
 }

@@ -1,19 +1,6 @@
 import { PubkeysSchema } from "pls-core";
 import { z } from "zod";
 
-const TaprootV0CollateralSchema = {
-	arbitratorsQuorum: z.number(),
-	multisigAddress: z.string(),
-	pubkeys: PubkeysSchema,
-};
-
-export const liquidCollateralSchema = z.object({
-	network: z.union([z.literal("liquid"), z.literal("liquid_testnet")]),
-	type: z.literal("taproot-v0"),
-	...TaprootV0CollateralSchema,
-	privateBlindingKey: z.string(),
-});
-
 import {
 	Transaction,
 	address as Address,
@@ -45,20 +32,33 @@ import { ZKPGenerator, ZKPValidator } from "./myZKP.js";
 
 import * as ecc from "tiny-secp256k1";
 
-// import { secp256k1Function } from "@vulpemventures/secp256k1-zkp/build/module/lib/index.js";
-// import { secp256k1Function } from "@vulpemventures/secp256k1-zkp/build/main/lib/index.js";
-
-function toReversed<T>(arr: T[]): T[] {
-	return [...arr].reverse();
-}
-
-import secp256k1 from "@vulpemventures/secp256k1-zkp";
+import secp256k1 from "@vulpemventures/secp256k1-zkp/lib/index.js";
 
 import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371.js";
 import type { HashTree } from "liquidjs-lib/src/bip341.js";
 import { script as bitcoinscript } from "bitcoinjs-lib";
 
-const zkpLib = await secp256k1.default();
+const TaprootV0CollateralSchema = {
+	arbitratorsQuorum: z.number(),
+	multisigAddress: z.string(),
+	privateBlindingKey: z.string(),
+	pubkeys: PubkeysSchema,
+	type: z.literal("taproot-v0"),
+};
+
+export const liquidSchemas = {
+	mainnet: z.object({
+		network: z.literal("liquid"),
+		...TaprootV0CollateralSchema,
+	}),
+	testnet: z.object({
+		network: z.literal("liquid_testnet"),
+		...TaprootV0CollateralSchema,
+	}),
+};
+
+// @ts-expect-error I have no idea
+const zkpLib: secp256k1 = await secp256k1();
 
 export const Confidential = new confidential.Confidential(zkpLib);
 
@@ -114,7 +114,7 @@ export function createLiquidMultisig(
 			// when building Taptree, prioritize parts agreement script (shortest path), using 1 for parts script and 5 for scripts with arbitrators
 			weight: idx ? 1 : 5,
 			leaf: { output: bitcoinscript.fromASM(ma) },
-			combination: childNodesCombinations[idx],
+			combination: childNodesCombinations[idx]!,
 		};
 	});
 
@@ -190,9 +190,6 @@ export async function startSpendFromLiquidMultisig(
 	);
 
 	const fees = balance - sentAmount;
-
-	console.log("balance:", balance);
-	console.log("fees:", fees);
 
 	if (fees < 0) {
 		return alert("negative fees");
@@ -439,4 +436,8 @@ export function getTapscriptSigsOrdered(
 		clientSigs,
 		arbitratorSigs,
 	};
+}
+
+function toReversed<T>(arr: T[]): T[] {
+	return [...arr].reverse();
 }
