@@ -22,6 +22,8 @@ import { calculateReissuanceToken } from "liquidjs-lib/src/issuance.js";
 import { AssetHash } from "liquidjs-lib/src/asset.js";
 import type { Secp256k1Interface as ZKPInterface } from "liquidjs-lib/src/secp256k1-zkp.js";
 
+import { Buffer } from "buffer";
+
 export class ZKPValidator {
 	private confidential: Confidential;
 

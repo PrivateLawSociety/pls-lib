@@ -9,12 +9,13 @@
 	"scripts": {
 		"dev": "npm run build -- --watch",
 		"build": "tsup index.ts --format esm --dts",
-		"test": "echo 'Add test script here'",
+		"test": "vitest",
 		"lint": "echo 'Add lint script here'"
 	},
 	"dependencies": {
 		"@vulpemventures/secp256k1-zkp": "^3.1.0",
 		"bitcoinjs-lib": "^6.1.5",
+		"buffer": "^6.0.3",
 		"ecpair": "^2.1.0",
 		"liquidjs-lib": "6.0.2-liquid.32",
 		"pls-core": "workspace:*",
@@ -24,6 +25,7 @@
 	"devDependencies": {
 		"@repo/eslint-config": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
-		"tsup": "^8.0.1"
+		"tsup": "^8.0.1",
+		"vitest": "^1.2.2"
 	}
 }

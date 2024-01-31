@@ -12,6 +12,8 @@ import {
 	bip341,
 } from "liquidjs-lib";
 
+import { Buffer } from "buffer";
+
 import { ECPairFactory } from "ecpair";
 
 const ECPair = ECPairFactory(ecc);
